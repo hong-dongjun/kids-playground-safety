@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>견적문의 | 어린이놀이시설안전관리</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="icon" href="images/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="quote">
+  <div id="site-header"></div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <span class="eyebrow">ESTIMATE</span>
+        <h1>견적문의</h1>
+        <p>신청서를 남겨주시면 확인 후 담당자가 연락드립니다.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container quote-wrap">
+        <div class="form-card">
+          <form id="quote-form" novalidate>
+            <!-- 1. 신청 내용 -->
+            <h3>1. 신청 내용</h3>
+            <div class="field" data-required="service">
+              <span class="label">필요한 서비스<span class="req">*</span></span>
+              <div class="choice-group">
+                <label><input type="radio" name="service" value="소독"><span>소독</span></label>
+                <label><input type="radio" name="service" value="유지보수"><span>유지보수</span></label>
+              </div>
+              <p class="error-msg">서비스를 골라주세요.</p>
+            </div>
+            <div class="field" data-required="facilityType">
+              <span class="label">시설 유형<span class="req">*</span></span>
+              <div class="choice-group">
+                <label><input type="radio" name="facilityType" value="아파트"><span>아파트</span></label>
+                <label><input type="radio" name="facilityType" value="어린이집·유치원"><span>어린이집·유치원</span></label>
+                <label><input type="radio" name="facilityType" value="학교"><span>학교</span></label>
+                <label><input type="radio" name="facilityType" value="공원"><span>공원</span></label>
+                <label><input type="radio" name="facilityType" value="기타"><span>기타</span></label>
+              </div>
+              <p class="error-msg">시설 유형을 골라주세요.</p>
+            </div>
+
+            <!-- 2. 현장 정보 -->
+            <h3>2. 현장 정보</h3>
+            <div class="field" data-required="facilityName">
+              <label for="facilityName">시설명<span class="req">*</span></label>
+              <input type="text" id="facilityName" name="facilityName" placeholder="OO아파트 어린이놀이터">
+              <p class="error-msg">시설명을 입력해주세요.</p>
+            </div>
+            <div class="field" data-required="address">
+              <label for="address">현장 주소<span class="req">*</span></label>
+              <input type="text" id="address" name="address" placeholder="OO시 OO구 OO로 00">
+              <p class="error-msg">현장 주소를 입력해주세요.</p>
+            </div>
+            <!-- 면적: 소독을 고를 때만 보입니다 (js/quote.js) -->
+            <div class="field" id="area-field" hidden>
+              <label for="area">면적</label>
+              <input type="text" id="area" name="area" placeholder="300㎡">
+            </div>
+            <!-- 요청 내용: 유지보수를 고를 때만 보입니다 (js/quote.js) -->
+            <div class="field" id="detail-field" hidden>
+              <label for="detail">요청 내용</label>
+              <textarea id="detail" name="detail" placeholder="그네 체인 2개가 녹슬었고, 미끄럼틀에 금이 갔습니다."></textarea>
+              <p class="hint">수리가 필요한 곳을 적어주세요.</p>
+            </div>
+            <div class="field">
+              <label for="photos">현장 사진 (선택)</label>
+              <input type="file" id="photos" name="photos" accept="image/*" multiple>
+              <p class="hint">사진을 올리면 더 정확한 견적을 받을 수 있습니다. (최대 5장)</p>
+            </div>
+
+            <!-- 3. 신청자 정보 -->
+            <h3>3. 신청자 정보</h3>
+            <div class="form-row">
+              <div class="field" data-required="name">
+                <label for="name">담당자 이름<span class="req">*</span></label>
+                <input type="text" id="name" name="name" placeholder="홍길동">
+                <p class="error-msg">담당자 이름을 입력해주세요.</p>
+              </div>
+              <div class="field">
+                <label for="org">소속</label>
+                <input type="text" id="org" name="org" placeholder="OO아파트 관리사무소">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field" data-required="phone">
+                <label for="phone">연락처<span class="req">*</span></label>
+                <input type="tel" id="phone" name="phone" placeholder="010-1234-5678">
+                <p class="error-msg">연락 가능한 전화번호를 입력해주세요.</p>
+              </div>
+              <div class="field" data-required="email">
+                <label for="email">이메일</label>
+                <input type="email" id="email" name="email" placeholder="name@example.com">
+                <p class="error-msg">이메일 형식을 확인해주세요.</p>
+              </div>
+            </div>
+
+            <div class="field agree" data-required="agree">
+              개인정보 수집·이용 안내: 견적 상담을 위해 이름, 연락처, 이메일, 현장 주소를 수집하며, 상담이 끝난 뒤 1년간 보관 후 파기합니다.
+              <label><input type="checkbox" name="agree" id="agree"> 개인정보 수집·이용에 동의합니다<span class="req">*</span></label>
+              <p class="error-msg">개인정보 수집·이용에 동의해주세요.</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary form-submit">견적 신청하기 <i class="ti ti-send"></i></button>
+          </form>
+
+          <!-- 신청 완료 화면 -->
+          <div class="success-panel" id="quote-success">
+            <i class="ti ti-circle-check"></i>
+            <h3>견적 신청이 접수되었습니다</h3>
+            <p>영업일 기준 1~2일 안에 담당자가 연락드리겠습니다.</p>
+            <a href="index.html" class="btn btn-line" style="margin-top:24px">메인으로</a>
+          </div>
+        </div>
+
+        <aside class="side-card">
+          <h4>견적 안내</h4>
+          <ul>
+            <li><i class="ti ti-circle-check"></i>견적 상담은 무료입니다</li>
+            <li><i class="ti ti-circle-check"></i>필요하면 현장을 방문해 정확한 견적을 드립니다</li>
+            <li><i class="ti ti-circle-check"></i>견적서는 이메일이나 문자로 보내드립니다</li>
+          </ul>
+          <div class="tel">
+            전화 상담
+            <strong data-site="tel"></strong>
+            <span data-site="hours" style="font-size:13px;color:#9fb2ae"></span>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="js/layout.js"></script>
+  <script src="js/quote.js"></script>
+</body>
+</html>

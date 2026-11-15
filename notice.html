@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>공지·공시 | 어린이놀이시설안전관리</title>
+  <title>공지 | 어린이놀이시설안전관리</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
   <link rel="icon" href="images/logo.png">
@@ -16,8 +16,8 @@
     <section class="page-hero">
       <div class="container">
         <span class="eyebrow">NOTICE</span>
-        <h1>공지·공시</h1>
-        <p>회사 소식과 공시 사항을 알려드립니다.</p>
+        <h1>공지</h1>
+        <p>회사 소식과 작업 소식을 알려드립니다.</p>
       </div>
     </section>
 
@@ -27,7 +27,8 @@
           <div class="tabs" role="tablist">
             <button class="active" data-cat="전체">전체</button>
             <button data-cat="공지">공지</button>
-            <button data-cat="공시">공시</button>
+            <button data-cat="소독">소독</button>
+            <button data-cat="유지보수">유지보수</button>
           </div>
           <form class="search" id="notice-search">
             <input type="search" id="notice-keyword" placeholder="제목이나 내용 검색" aria-label="공지 검색">
@@ -35,13 +36,21 @@
           </form>
         </div>
         <div class="board" id="notice-board"></div>
+        <!-- 사진을 누르면 크게 보는 창 (js/notice.js) -->
+        <div class="lightbox" id="lightbox" hidden>
+          <button class="lightbox-close" aria-label="닫기"><i class="ti ti-x"></i></button>
+          <img alt="">
+        </div>
       </div>
     </section>
   </main>
 
   <div id="site-footer"></div>
   <script src="js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/notice-data.js"></script>
+  <script src="js/db.js"></script>
   <script src="js/notice.js"></script>
 </body>
 </html>

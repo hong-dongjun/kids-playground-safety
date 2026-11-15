@@ -24,7 +24,7 @@ const MENU = [
   { id: "about", label: "회사소개", href: "about.html" },
   { id: "disinfection", label: "소독", href: "disinfection.html" },
   { id: "maintenance", label: "유지보수", href: "maintenance.html" },
-  { id: "notice", label: "공지·공시", href: "notice.html" },
+  { id: "notice", label: "공지", href: "notice.html" },
   { id: "edu", label: "안전교육", href: EDU_LINKS.main, external: true },
   { id: "quote", label: "견적문의", href: "quote.html", cta: true },
 ];
@@ -40,6 +40,15 @@ function renderHeader() {
   }).join("");
 
   document.getElementById("site-header").innerHTML = `
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <span><i class="ti ti-shield-check" aria-hidden="true"></i> 2015년부터 어린이놀이시설 소독·유지보수</span>
+        <span class="topbar-contact">
+          <a href="tel:${SITE.tel.replaceAll("-", "")}"><i class="ti ti-phone" aria-hidden="true"></i> ${SITE.tel}</a>
+          <span>${SITE.hours}</span>
+        </span>
+      </div>
+    </div>
     <header class="site-header">
       <div class="container header-inner">
         <a href="index.html" class="logo"><img src="images/logo.png" alt="" class="logo-img">${SITE.name}</a>
@@ -66,9 +75,10 @@ function renderFooter() {
           <div class="footer-links">
             <a href="about.html">회사소개</a>
             <a href="quote.html">견적문의</a>
-            <a href="notice.html">공지·공시</a>
+            <a href="notice.html">공지</a>
             <a href="${EDU_LINKS.main}" target="_blank" rel="noopener">안전교육 (외부)</a>
             <a href="#">개인정보처리방침</a>
+            <a href="admin.html" class="footer-admin">관리자</a>
           </div>
         </div>
         <div class="footer-info">
@@ -79,6 +89,42 @@ function renderFooter() {
         <p class="copyright">© ${new Date().getFullYear()} ${SITE.name}. All rights reserved.</p>
       </div>
     </footer>`;
+}
+
+// 화면 오른쪽 아래에 늘 떠 있는 전화 상담 + 맨 위로 버튼
+function renderFloating() {
+  const box = document.createElement("div");
+  box.className = "float-call";
+  box.innerHTML = `
+    <a class="float-tel" href="tel:${SITE.tel.replaceAll("-", "")}" title="전화 상담">
+      <i class="ti ti-phone" aria-hidden="true"></i>
+      <span><small>전화 상담</small><strong>${SITE.tel}</strong></span>
+    </a>
+    <button class="float-top" aria-label="맨 위로"><i class="ti ti-arrow-up"></i></button>`;
+  document.body.appendChild(box);
+  const topBtn = box.querySelector(".float-top");
+  topBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  const onScroll = () => box.classList.toggle("scrolled", window.scrollY > 400);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+}
+
+// 스크롤해서 화면에 들어올 때 살짝 떠오르는 효과 (class="reveal" 이 붙은 요소)
+function setupReveal() {
+  const items = document.querySelectorAll(".reveal");
+  if (!("IntersectionObserver" in window)) {
+    items.forEach((el) => el.classList.add("visible"));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  items.forEach((el) => io.observe(el));
 }
 
 // 페이지 안에서 data-site="tel" 처럼 표시된 곳에 회사 정보를 채웁니다.
@@ -95,4 +141,6 @@ function fillSiteInfo() {
 
 renderHeader();
 renderFooter();
+renderFloating();
 fillSiteInfo();
+setupReveal();

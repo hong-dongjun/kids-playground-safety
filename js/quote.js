@@ -69,21 +69,40 @@
     }
   });
 
+  // 신청서 내용 → Supabase quotes 표의 칸 이름에 맞춤
   function collect() {
-    const data = Object.fromEntries(new FormData(form));
-    delete data.photos;
-    if (detailField.hidden) delete data.detail;
-    if (areaField.hidden) delete data.area;
-    data.photoCount = photos.files.length;
-    data.submittedAt = new Date().toISOString();
-    return data;
+    const f = form.elements;
+    const opt = (v) => (v && v.trim() ? v.trim() : null);
+    return {
+      service: form.querySelector('input[name="service"]:checked').value,
+      facility_type: form.querySelector('input[name="facilityType"]:checked').value,
+      facility_name: val("facilityName"),
+      address: val("address"),
+      area: areaField.hidden ? null : opt(f.area.value),
+      detail: detailField.hidden ? null : opt(f.detail.value),
+      name: val("name"),
+      org: opt(f.org.value),
+      phone: val("phone"),
+      email: opt(f.email.value),
+    };
   }
 
-  // 2단계에서 실제 접수(데이터베이스 저장, 이메일 알림 등)로 바꿀 함수
+  // Supabase 에 저장 (사진은 줄여서 quote-photos 저장소에 먼저 올림)
   async function sendQuote(data) {
-    console.log("견적 신청 내용:", data);
-    return true;
+    if (!db) throw new Error("not-configured");
+    const paths = [];
+    for (const file of [...photos.files].slice(0, 5)) {
+      const blob = await resizeImage(file);
+      const path = newPhotoPath("quote");
+      const { error } = await db.storage.from(QUOTE_BUCKET).upload(path, blob, { contentType: "image/jpeg" });
+      if (error) throw error;
+      paths.push(path);
+    }
+    const { error } = await db.from("quotes").insert({ ...data, photos: paths });
+    if (error) throw error;
   }
+
+  const submitError = document.getElementById("submit-error");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -93,11 +112,20 @@
       return;
     }
     const button = form.querySelector(".form-submit");
+    const label = button.innerHTML;
     button.disabled = true;
     button.textContent = "접수 중…";
-    await sendQuote(collect());
-    form.style.display = "none";
-    success.classList.add("show");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    submitError.hidden = true;
+    try {
+      await sendQuote(collect());
+      form.style.display = "none";
+      success.classList.add("show");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      // 접수가 안 됐으면 솔직하게 알리고 전화를 안내
+      submitError.hidden = false;
+      button.disabled = false;
+      button.innerHTML = label;
+    }
   });
 })();

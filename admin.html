@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>관리자 | 어린이놀이시설안전관리</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="icon" href="images/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin">
+  <header class="admin-bar">
+    <div class="container admin-bar-inner">
+      <span class="logo"><img src="images/logo.png" alt="" class="logo-img">관리자 페이지</span>
+      <div class="admin-bar-actions">
+        <a href="index.html" target="_blank" rel="noopener"><i class="ti ti-external-link"></i> 홈페이지 보기</a>
+        <button id="logout-btn" class="admin-link" hidden><i class="ti ti-logout"></i> 로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container admin-main">
+    <!-- 안내 메시지 (연결 안 됨, 권한 없음 등) -->
+    <div class="admin-notice" id="admin-notice" hidden></div>
+
+    <!-- 1. 로그인 -->
+    <section class="login-card" id="login-view" hidden>
+      <h1>관리자 로그인</h1>
+      <p>Supabase 에 등록한 관리자 이메일과 비밀번호로 로그인하세요.</p>
+      <form id="login-form">
+        <div class="field"><label for="login-email">이메일</label><input type="email" id="login-email" autocomplete="username" required></div>
+        <div class="field"><label for="login-password">비밀번호</label><input type="password" id="login-password" autocomplete="current-password" required></div>
+        <p class="form-msg error" id="login-error" hidden></p>
+        <button type="submit" class="btn btn-primary form-submit">로그인</button>
+      </form>
+    </section>
+
+    <!-- 2. 관리 화면 -->
+    <section id="app-view" hidden>
+      <div class="admin-tabs">
+        <button class="active" data-panel="posts-panel"><i class="ti ti-news"></i> 글 관리</button>
+        <button data-panel="quotes-panel"><i class="ti ti-file-invoice"></i> 견적 신청 <span class="count-badge" id="new-quote-count" hidden></span></button>
+      </div>
+
+      <!-- 2-1. 글 목록 -->
+      <div class="admin-panel" id="posts-panel">
+        <div class="panel-head">
+          <div class="tabs" id="post-filter">
+            <button class="active" data-cat="전체">전체</button>
+            <button data-cat="공지">공지</button>
+            <button data-cat="소독">소독</button>
+            <button data-cat="유지보수">유지보수</button>
+          </div>
+          <button class="btn btn-primary" id="new-post-btn"><i class="ti ti-plus"></i> 새 글 쓰기</button>
+        </div>
+        <div class="admin-list" id="post-list"></div>
+      </div>
+
+      <!-- 2-2. 글 쓰기 / 수정 -->
+      <div class="admin-panel" id="editor-panel" hidden>
+        <form class="form-card" id="post-form" novalidate>
+          <h3 id="editor-title">새 글 쓰기</h3>
+          <div class="field">
+            <span class="label">분류<span class="req">*</span></span>
+            <div class="choice-group">
+              <label><input type="radio" name="category" value="공지" checked><span>공지</span></label>
+              <label><input type="radio" name="category" value="소독"><span>소독</span></label>
+              <label><input type="radio" name="category" value="유지보수"><span>유지보수</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="post-title">제목<span class="req">*</span></label>
+            <input type="text" id="post-title" maxlength="200" placeholder="OO초등학교 놀이시설 소독">
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="post-date">날짜<span class="req">*</span></label>
+              <input type="date" id="post-date">
+            </div>
+            <div class="field">
+              <span class="label">맨 위 고정</span>
+              <label class="check-line"><input type="checkbox" id="post-pinned"> 목록 맨 위에 고정합니다</label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="post-body">내용</label>
+            <textarea id="post-body" maxlength="10000" placeholder="OO초등학교 놀이시설 모래 고온·고압 스팀 소독을 진행했습니다."></textarea>
+          </div>
+          <div class="field">
+            <span class="label">사진</span>
+            <label class="drop-zone" id="drop-zone">
+              <input type="file" id="post-photos" accept="image/*" multiple hidden>
+              <i class="ti ti-photo-plus"></i>
+              <strong>사진을 여기로 끌어다 놓거나 눌러서 고르세요</strong>
+              <span>여러 장 한 번에 가능 · 큰 사진은 자동으로 줄여서 올라갑니다</span>
+            </label>
+            <div class="thumb-list" id="thumb-list"></div>
+          </div>
+          <p class="form-msg error" id="post-error" hidden></p>
+          <div class="editor-actions">
+            <button type="button" class="btn btn-line" id="cancel-post-btn">취소</button>
+            <button type="submit" class="btn btn-primary" id="save-post-btn"><i class="ti ti-device-floppy"></i> 저장하기</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 2-3. 견적 신청 목록 -->
+      <div class="admin-panel" id="quotes-panel" hidden>
+        <div class="panel-head">
+          <div class="tabs" id="quote-filter">
+            <button class="active" data-status="전체">전체</button>
+            <button data-status="새 신청">새 신청</button>
+            <button data-status="연락함">연락함</button>
+            <button data-status="완료">완료</button>
+          </div>
+          <button class="btn btn-line" id="reload-quotes-btn"><i class="ti ti-refresh"></i> 새로고침</button>
+        </div>
+        <div class="admin-list" id="quote-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 사진 크게 보기 -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox-close" aria-label="닫기"><i class="ti ti-x"></i></button>
+    <img alt="">
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

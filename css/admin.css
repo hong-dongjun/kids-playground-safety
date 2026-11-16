@@ -84,3 +84,10 @@ body.admin { background: var(--soft); min-height: 100vh; }
   .quote-grid .wide { grid-column: 2; }
   .login-card { padding: 24px; }
 }
+
+/* 작업 전·후 비교 선택 */
+.compare-option { display: flex !important; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 14px 16px; background: var(--soft); border-radius: var(--radius); font-weight: 400 !important; font-size: 14px; color: var(--text-sub); cursor: pointer; }
+.compare-option input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+.compare-option strong { display: block; color: var(--text); font-size: 15px; }
+.thumb-item .move { position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(255,255,255,.9); color: var(--text); cursor: pointer; display: grid; place-items: center; }
+.thumb-item .order { position: absolute; right: 6px; bottom: 6px; background: rgba(10,31,59,.8); color: #fff; font-size: 11px; padding: 1px 7px; border-radius: 4px; }

@@ -22,7 +22,7 @@ async function fetchPosts() {
   }
   const { data, error } = await db
     .from("posts")
-    .select("id, category, title, body, post_date, pinned, photos")
+    .select("*")
     .order("pinned", { ascending: false })
     .order("post_date", { ascending: false })
     .order("id", { ascending: false });
@@ -34,9 +34,29 @@ async function fetchPosts() {
     body: p.body,
     date: p.post_date,
     pinned: p.pinned,
+    compare: !!p.compare,          // 첫 두 장을 '작업 전·후 비교'로 보여줄지
     photos: (p.photos || []).map(photoUrl),
   }));
 }
+
+// 작업 전·후 비교 화면 (가운데 손잡이를 좌우로 밀어서 비교)
+function compareHtml(before, after, title) {
+  const e = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  return `
+    <div class="compare" style="--pos:50%">
+      <img class="compare-img" src="${e(after)}" alt="${e(title)} 작업 후" loading="lazy">
+      <img class="compare-img compare-before" src="${e(before)}" alt="${e(title)} 작업 전" loading="lazy">
+      <span class="compare-label left">작업 전</span>
+      <span class="compare-label right">작업 후</span>
+      <span class="compare-handle" aria-hidden="true"><i class="ti ti-arrows-horizontal"></i></span>
+      <input type="range" class="compare-range" min="0" max="100" value="50" aria-label="작업 전·후 비교 (좌우로 밀기)">
+    </div>`;
+}
+document.addEventListener("input", (e) => {
+  if (e.target.classList && e.target.classList.contains("compare-range")) {
+    e.target.parentElement.style.setProperty("--pos", e.target.value + "%");
+  }
+});
 
 // 사진 줄이기: 긴 쪽 최대 1600px, JPEG 로 저장 (휴대폰 사진 5MB → 300KB 안팎)
 function resizeImage(file, maxSize = 1600, quality = 0.82) {

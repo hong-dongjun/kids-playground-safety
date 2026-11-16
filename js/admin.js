@@ -160,22 +160,26 @@
   // 3. 글 쓰기 / 수정
   // ---------------------------------------------------------
   let editing = null;        // 수정 중인 글 (새 글이면 null)
-  let keptPhotos = [];       // 이미 올라가 있는 사진 (저장소 위치)
-  let newFiles = [];         // 새로 고른 사진 { file, url }
+  // 사진 목록 (순서대로): { path } = 이미 올라간 사진, { file, url } = 새로 고른 사진
+  let photoItems = [];
 
   $("new-post-btn").addEventListener("click", () => openEditor(null));
   $("cancel-post-btn").addEventListener("click", closeEditor);
 
+  function clearNewPreviews() {
+    photoItems.forEach((p) => p.url && URL.revokeObjectURL(p.url));
+  }
+
   function openEditor(post) {
     editing = post;
-    keptPhotos = post ? [...post.photos] : [];
-    newFiles.forEach((f) => URL.revokeObjectURL(f.url));
-    newFiles = [];
+    clearNewPreviews();
+    photoItems = post ? post.photos.map((path) => ({ path })) : [];
     $("editor-title").textContent = post ? "글 수정" : "새 글 쓰기";
     document.querySelector(`#post-form input[name="category"][value="${post ? post.category : "공지"}"]`).checked = true;
     $("post-title").value = post ? post.title : "";
     $("post-date").value = post ? post.post_date : today();
     $("post-pinned").checked = post ? post.pinned : false;
+    $("post-compare").checked = post ? !!post.compare : false;
     $("post-body").value = post ? post.body : "";
     $("post-error").hidden = true;
     renderThumbs();
@@ -191,25 +195,34 @@
   }
 
   function renderThumbs() {
-    $("thumb-list").innerHTML =
-      keptPhotos.map((path, i) => `
-        <div class="thumb-item"><img src="${esc(photoUrl(path))}" alt="">
-          <button type="button" class="remove" data-kept="${i}" aria-label="사진 빼기"><i class="ti ti-x"></i></button></div>`).join("") +
-      newFiles.map((f, i) => `
-        <div class="thumb-item"><img src="${f.url}" alt=""><span class="new-tag">새 사진</span>
-          <button type="button" class="remove" data-new="${i}" aria-label="사진 빼기"><i class="ti ti-x"></i></button></div>`).join("");
+    const compare = $("post-compare").checked;
+    $("thumb-list").innerHTML = photoItems.map((p, i) => `
+      <div class="thumb-item">
+        <img src="${p.path ? esc(photoUrl(p.path)) : p.url}" alt="">
+        ${p.url ? '<span class="new-tag">새 사진</span>' : ""}
+        ${i > 0 ? `<button type="button" class="move" data-move="${i}" aria-label="앞으로 옮기기"><i class="ti ti-arrow-left"></i></button>` : ""}
+        <span class="order">${compare && i === 0 ? "작업 전" : compare && i === 1 ? "작업 후" : i + 1}</span>
+        <button type="button" class="remove" data-remove="${i}" aria-label="사진 빼기"><i class="ti ti-x"></i></button>
+      </div>`).join("");
   }
+  $("post-compare").addEventListener("change", renderThumbs);
 
   $("thumb-list").addEventListener("click", (e) => {
-    const k = e.target.closest("[data-kept]");
-    const n = e.target.closest("[data-new]");
-    if (k) keptPhotos.splice(Number(k.dataset.kept), 1);
-    if (n) { URL.revokeObjectURL(newFiles[Number(n.dataset.new)].url); newFiles.splice(Number(n.dataset.new), 1); }
+    const rm = e.target.closest("[data-remove]");
+    const mv = e.target.closest("[data-move]");
+    if (rm) {
+      const [item] = photoItems.splice(Number(rm.dataset.remove), 1);
+      if (item.url) URL.revokeObjectURL(item.url);
+    }
+    if (mv) {
+      const i = Number(mv.dataset.move);
+      [photoItems[i - 1], photoItems[i]] = [photoItems[i], photoItems[i - 1]];
+    }
     renderThumbs();
   });
 
   function addFiles(files) {
-    [...files].filter((f) => f.type.startsWith("image/")).forEach((file) => newFiles.push({ file, url: URL.createObjectURL(file) }));
+    [...files].filter((f) => f.type.startsWith("image/")).forEach((file) => photoItems.push({ file, url: URL.createObjectURL(file) }));
     renderThumbs();
   }
   $("post-photos").addEventListener("change", (e) => { addFiles(e.target.files); e.target.value = ""; });
@@ -229,6 +242,11 @@
       err.hidden = false;
       return;
     }
+    if ($("post-compare").checked && photoItems.length < 2) {
+      err.textContent = "작업 전·후 비교를 하려면 사진이 2장 이상 필요합니다.";
+      err.hidden = false;
+      return;
+    }
     err.hidden = true;
     const btn = $("save-post-btn");
     const label = btn.innerHTML;
@@ -236,14 +254,18 @@
 
     const uploaded = [];
     try {
-      // 새 사진 줄여서 올리기
-      for (let i = 0; i < newFiles.length; i++) {
-        btn.textContent = `사진 올리는 중 ${i + 1}/${newFiles.length}…`;
-        const blob = await resizeImage(newFiles[i].file);
+      // 새 사진 줄여서 올리기 (순서 유지)
+      const newCount = photoItems.filter((p) => p.file).length;
+      const finalPaths = [];
+      for (const p of photoItems) {
+        if (p.path) { finalPaths.push(p.path); continue; }
+        btn.textContent = `사진 올리는 중 ${uploaded.length + 1}/${newCount}…`;
+        const blob = await resizeImage(p.file);
         const path = newPhotoPath("post");
         const { error } = await db.storage.from(POST_BUCKET).upload(path, blob, { contentType: "image/jpeg" });
         if (error) throw error;
         uploaded.push(path);
+        finalPaths.push(path);
       }
       btn.textContent = "저장하는 중…";
       const row = {
@@ -251,8 +273,9 @@
         title,
         post_date: date,
         pinned: $("post-pinned").checked,
+        compare: $("post-compare").checked,
         body: $("post-body").value.trim(),
-        photos: [...keptPhotos, ...uploaded],
+        photos: finalPaths,
         updated_at: new Date().toISOString(),
       };
       const { error } = editing
@@ -262,14 +285,18 @@
 
       // 수정하면서 뺀 사진은 저장소에서도 지움
       if (editing) {
-        const removed = editing.photos.filter((p) => !keptPhotos.includes(p));
+        const removed = editing.photos.filter((p) => !finalPaths.includes(p));
         if (removed.length) await db.storage.from(POST_BUCKET).remove(removed);
       }
+      clearNewPreviews();
+      photoItems = [];
       closeEditor();
       loadPosts();
     } catch (ex) {
       if (uploaded.length) await db.storage.from(POST_BUCKET).remove(uploaded);
-      err.textContent = "저장하지 못했습니다. 인터넷 연결을 확인하고 다시 시도해주세요.";
+      err.textContent = /compare/.test(ex?.message || "")
+        ? "Supabase 에 '전·후 비교' 칸이 아직 없습니다. 안내드린 SQL 을 먼저 실행해주세요."
+        : "저장하지 못했습니다. 인터넷 연결을 확인하고 다시 시도해주세요.";
       err.hidden = false;
     } finally {
       btn.disabled = false;

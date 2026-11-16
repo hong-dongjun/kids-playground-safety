@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="어린이놀이시설안전관리">
+  <meta property="og:title" content="어린이놀이시설안전관리 | 놀이시설 소독·유지보수 전문">
+  <meta property="og:description" content="2015년부터 학교·유치원·공원 어린이놀이시설을 고온·고압 스팀으로 소독하고 유지보수합니다. 전화 1577-2448">
+  <meta property="og:image" content="https://hong-dongjun.github.io/kids-playground-safety/images/logo.png">
+  <meta property="og:locale" content="ko_KR">
   <title>어린이놀이시설안전관리 | 어린이놀이시설 소독·유지보수 전문</title>
   <meta name="description" content="2015년부터 학교·유치원·공원 어린이놀이시설을 고온·고압 스팀으로 소독하고 유지보수합니다. 견적 문의를 남겨주세요.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -105,6 +111,8 @@
           </div>
           <a href="notice.html" class="btn btn-line">전체 보기 <i class="ti ti-arrow-right"></i></a>
         </div>
+        <!-- 관리자 페이지에서 '작업 전·후 비교'로 체크한 가장 최근 글 -->
+        <div class="compare-feature" id="compare-feature" hidden></div>
         <div class="work-grid" id="recent-works"></div>
       </div>
     </section>
@@ -126,8 +134,45 @@
       </div>
     </section>
 
-    <!-- 6. 공지사항 + 안전교육 바로가기 -->
-    <section class="section section-soft">
+    <!-- 6. 자주 묻는 질문 (질문을 더하려면 <details> 한 덩어리를 복사해서 고치면 됩니다) -->
+    <section class="section section-soft" id="faq">
+      <div class="container faq-wrap">
+        <div class="reveal">
+          <span class="eyebrow">FAQ</span>
+          <h2 class="section-title">자주 묻는 질문</h2>
+          <p class="section-desc">궁금한 점이 더 있으시면 언제든 전화 주세요.<br><strong data-site="tel"></strong> (<span data-site="hours"></span>)</p>
+        </div>
+        <div class="faq-list reveal">
+          <details open>
+            <summary>소독은 얼마나 걸리나요?</summary>
+            <p>놀이시설마다 다르지만, 초등학교와 병설유치원을 함께 소독하는 경우 보통 <strong>2~3시간</strong> 정도 걸립니다.</p>
+          </details>
+          <details>
+            <summary>아이들은 언제부터 놀 수 있나요?</summary>
+            <p>소독이 끝나면 <strong>바로 사용하셔도 괜찮습니다.</strong></p>
+          </details>
+          <details>
+            <summary>비 오는 날도 소독하나요?</summary>
+            <p>비가 많이 오는 날은 작업하지 않습니다. 날씨에 따라 일정을 다시 잡아 연락드립니다.</p>
+          </details>
+          <details>
+            <summary>소독 증명서를 받을 수 있나요?</summary>
+            <p>네, <strong>소독 증명서를 발급해드립니다.</strong> 작업이 끝나면 관련 서류를 정리해 학교 이메일로 보내드립니다.</p>
+          </details>
+          <details>
+            <summary>1년에 몇 번 소독해야 하나요?</summary>
+            <p>법적 기준은 연 5회이지만, 보통 학교에서는 <strong>상반기 1회, 하반기 1회</strong>로 연 2회 정도 진행합니다.</p>
+          </details>
+          <details>
+            <summary>기생충란 검사도 해주시나요?</summary>
+            <p>네, <strong>기생충란 검사도 해드립니다.</strong> 견적 문의 때 함께 말씀해주세요.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. 공지사항 + 안전교육 바로가기 -->
+    <section class="section">
       <div class="container home-bottom">
         <div class="box box-white reveal">
           <div class="box-head">
@@ -147,8 +192,8 @@
       </div>
     </section>
 
-    <!-- 7. 관련 사이트 (목록은 js/home.js 의 RELATED_SITES) -->
-    <section class="section">
+    <!-- 8. 관련 사이트 (목록은 js/home.js 의 RELATED_SITES) -->
+    <section class="section section-soft">
       <div class="container">
         <div class="reveal">
           <span class="eyebrow">LINKS</span>
@@ -159,7 +204,7 @@
       </div>
     </section>
 
-    <!-- 8. 견적 유도 -->
+    <!-- 9. 견적 유도 -->
     <section class="cta-band">
       <div class="container">
         <div>

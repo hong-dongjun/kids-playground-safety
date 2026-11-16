@@ -77,7 +77,8 @@ function renderFooter() {
             <a href="quote.html">견적문의</a>
             <a href="notice.html">공지</a>
             <a href="${EDU_LINKS.main}" target="_blank" rel="noopener">안전교육 (외부)</a>
-            <a href="#">개인정보처리방침</a>
+            <a href="privacy.html" class="footer-strong">개인정보처리방침</a>
+            <a href="privacy.html#email">이메일무단수집거부</a>
             <a href="admin.html" class="footer-admin">관리자</a>
           </div>
         </div>

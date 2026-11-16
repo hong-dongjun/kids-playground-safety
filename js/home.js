@@ -39,10 +39,27 @@ const RELATED_SITES = [
       .filter((n) => (n.category === "소독" || n.category === "유지보수") && n.photos.length)
       .sort((a, b) => b.date.localeCompare(a.date))
       .slice(0, 4);
+    // 전·후 비교: '작업 전·후 비교'로 체크한 가장 최근 글 하나를 크게
+    const cmp = posts
+      .filter((n) => n.compare && n.photos.length >= 2)
+      .sort((a, b) => b.date.localeCompare(a.date))[0];
+    if (cmp) {
+      const box = document.getElementById("compare-feature");
+      box.innerHTML = `
+        ${compareHtml(cmp.photos[0], cmp.photos[1], cmp.title)}
+        <div>
+          <span class="badge ${cmp.category === "소독" ? "disinfect" : "repair"}">${esc(cmp.category)}</span>
+          <h3>${esc(cmp.title)}</h3>
+          <p>가운데 손잡이를 좌우로 밀어서 작업 전과 후를 비교해보세요.</p>
+          <a href="notice.html#n${cmp.id}" class="more-link">자세히 보기 <i class="ti ti-arrow-right"></i></a>
+        </div>`;
+      box.hidden = false;
+      document.getElementById("recent-works-section").hidden = false;
+    }
     if (works.length) {
       document.getElementById("recent-works").innerHTML = works.map((n) => `
         <a class="work-card reveal" href="notice.html#n${n.id}">
-          <div class="work-photo"><img src="${esc(n.photos[0])}" alt="${esc(n.title)}" loading="lazy"></div>
+          <div class="work-photo"><img src="${esc(n.compare && n.photos[1] ? n.photos[1] : n.photos[0])}" alt="${esc(n.title)}" loading="lazy"></div>
           <div class="work-info">
             <span class="badge ${n.category === "소독" ? "disinfect" : "repair"}">${n.category}</span>
             <strong>${esc(n.title)}</strong>

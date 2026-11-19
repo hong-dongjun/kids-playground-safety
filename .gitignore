@@ -1,2 +1,7 @@
 .claude/
 supabase/
+# 폴더 맨 위에 둔 원본 사진은 올리지 않음 (사이트용 사진은 images 폴더에)
+/*.jpg
+/*.jpeg
+/*.png
+/*.webp
